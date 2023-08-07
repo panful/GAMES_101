@@ -1,16 +1,19 @@
 /*
- * 1.Eigen和OpenCV环境测试
- * 2.Eigen中向量的常见运算
- * 3.Eigen中矩阵的常见运算
+ * 0.Eigen和OpenCV环境测试
+
+ * 101.Eigen中向量的常见运算
+ * 102.Eigen中矩阵的常见运算
+ *
+ * 201.OpenCV写图片
  */
 
 // Eigen 使用笔记：
 // http://zhaoxuhui.top/blog/2019/08/21/eigen-note-1.html
 // https://zxl19.github.io/eigen-note/
 
-#define TEST3
+#define TEST201
 
-#ifdef TEST1
+#ifdef TEST0
 #include <Eigen/Core>
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -22,9 +25,9 @@ int main()
 
     std::cout << "Test OpenCV Eigen\n";
 }
-#endif // TEST1
+#endif // TEST0
 
-#ifdef TEST2
+#ifdef TEST101
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -61,9 +64,9 @@ int main()
               << v1.cross(v2) << '\n';
 }
 
-#endif // TEST2
+#endif // TEST101
 
-#ifdef TEST3
+#ifdef TEST102
 
 #include <Eigen/Dense>
 #include <iostream>
@@ -98,4 +101,31 @@ int main()
     std::cout << "--------------------------------------------\n" << m1 << "\n*\n" << vec << "\n=\n" << m1 * vec << '\n';
 }
 
-#endif // TEST3
+#endif // TEST102
+
+#ifdef TEST201
+
+#include <opencv2/opencv.hpp>
+
+int main()
+{
+    // 创建一个空的黑色图像，大小为100x100
+    cv::Mat image(100, 100, CV_8UC3, cv::Scalar(0, 0, 0));
+
+    // 设置图像为绿色（OpenCV使用BGR颜色通道顺序）
+    cv::Scalar green_color(0, 255, 0);
+    image.setTo(green_color);
+
+    // 将图像写入文件
+    if (cv::imwrite("green_image.png", image))
+    {
+        std::cout << "image write success\n";
+    }
+
+    // 在窗口中显示图片
+    cv::imshow("OpenCV Window", image);
+    cv::waitKey();           // 等待按下任意键盘上的按钮
+    cv::destroyAllWindows(); // 销毁窗口
+}
+
+#endif // TEST201

@@ -11,7 +11,7 @@ function(BuildTarget path)
         
         # opencv eigen
         target_include_directories(${target_name} PRIVATE ${EIGEN3_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
-        target_link_libraries(${target_name} PRIVATE opencv_core)
+        target_link_libraries(${target_name} PRIVATE opencv_highgui)
 
         # install
         install(TARGETS ${target_name} RUNTIME DESTINATION .)

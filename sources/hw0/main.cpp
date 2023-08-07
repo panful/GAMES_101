@@ -3,6 +3,8 @@
 
  * 101.Eigen中向量的常见运算
  * 102.Eigen中矩阵的常见运算
+ * 103.设置矩阵的元素
+ * 104.缩放、平移、旋转矩阵的生成
  *
  * 201.OpenCV写图片
  */
@@ -102,6 +104,98 @@ int main()
 }
 
 #endif // TEST102
+
+#ifdef TEST103
+
+#include <Eigen/Dense>
+#include <iostream>
+
+int main()
+{
+    // 创建一个单位矩阵
+    Eigen::Matrix4d mat { Eigen::Matrix4d::Identity() };
+    std::cout << "----------------\n" << mat << '\n';
+
+    // 设置矩阵的[0,0]元素为2，[M,N]第M行，第N列
+    mat(0, 0) = 2;
+    std::cout << "----------------\n" << mat << '\n';
+
+    // 设置矩阵的所有元素值为0
+    mat = Eigen::Matrix4d::Zero();
+    std::cout << "----------------\n" << mat << '\n';
+
+    // 设置矩阵的所有元素值为1
+    mat = Eigen::Matrix4d::Ones();
+    std::cout << "----------------\n" << mat << '\n';
+}
+
+#endif // TEST103
+
+#ifdef TEST104
+
+#include <Eigen/Dense>
+#include <iostream>
+#include <numbers>
+
+int main()
+{
+    // 缩放
+    {
+        Eigen::Vector4d vec { 1, 2, 0, 1 };
+        Eigen::Matrix4d mat { Eigen::Matrix4d::Identity() };
+
+        mat(0, 0) = 2.0; // x缩放为原来的2倍
+        mat(1, 1) = 0.5; // y缩放为原来的0.5倍
+        mat(2, 2) = 1.0; // z不缩放
+
+        std::cout << "--------------------------\n" << mat << '\n';
+        std::cout << mat * vec << '\n';
+    }
+
+    // 平移
+    {
+        Eigen::Vector4d vec { 1, 2, 0, 1 };
+        Eigen::Matrix4d mat { Eigen::Matrix4d::Identity() };
+
+        mat(0, 3) = 1;  // 向+x平移1个单位
+        mat(1, 3) = 2;  // 向+y平移2个单位
+        mat(2, 3) = -1; // 向-z平移1个单位
+
+        std::cout << "--------------------------\n" << mat << '\n';
+        std::cout << mat * vec << '\n';
+    }
+
+    // 旋转
+    {
+        Eigen::Vector4d vec { 1, 0, 0, 1 };
+        Eigen::Matrix4d mat { Eigen::Matrix4d::Identity() };
+
+        double angle = 45.0 / 180.0 * std::numbers::pi; // 旋转的弧度（逆时针）
+        double X     = 0.0;                             // XYZ组成旋转的轴
+        double Y     = 0.0;
+        double Z     = 1.0;
+
+        auto cos0 = std::cos(angle);
+        auto sin0 = std::sin(angle);
+
+        mat(0, 0) = cos0 + X * X * (1 - cos0);
+        mat(0, 1) = X * Y * (1 - cos0) - Z * sin0;
+        mat(0, 2) = X * Z * (1 - cos0) + Y * sin0;
+
+        mat(1, 0) = Y * Z * (1 - cos0) + Z * sin0;
+        mat(1, 1) = cos0 + Y * Y * (1 - cos0);
+        mat(1, 2) = Y * Z * (1 - cos0) - Z * sin0;
+
+        mat(2, 0) = X * Z * (1 - cos0) - Y * sin0;
+        mat(2, 1) = Y * Z * (1 - cos0) + X * sin0;
+        mat(2, 2) = cos0 + Z * Z * (1 - cos0);
+
+        std::cout << "--------------------------\n" << mat << '\n';
+        std::cout << mat * vec << '\n';
+    }
+}
+
+#endif // TEST104
 
 #ifdef TEST201
 

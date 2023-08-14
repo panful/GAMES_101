@@ -178,16 +178,17 @@ int main()
         auto cos0 = std::cos(angle);
         auto sin0 = std::sin(angle);
 
+        // 注意：Eigen是列向量 glm是行向量
         mat(0, 0) = cos0 + X * X * (1 - cos0);
-        mat(0, 1) = X * Y * (1 - cos0) - Z * sin0;
-        mat(0, 2) = X * Z * (1 - cos0) + Y * sin0;
+        mat(1, 0) = X * Y * (1 - cos0) - Z * sin0;
+        mat(2, 0) = X * Z * (1 - cos0) + Y * sin0;
 
-        mat(1, 0) = Y * Z * (1 - cos0) + Z * sin0;
+        mat(0, 1) = Y * Z * (1 - cos0) + Z * sin0;
         mat(1, 1) = cos0 + Y * Y * (1 - cos0);
-        mat(1, 2) = Y * Z * (1 - cos0) - Z * sin0;
+        mat(2, 1) = Y * Z * (1 - cos0) - Z * sin0;
 
-        mat(2, 0) = X * Z * (1 - cos0) - Y * sin0;
-        mat(2, 1) = Y * Z * (1 - cos0) + X * sin0;
+        mat(0, 2) = X * Z * (1 - cos0) - Y * sin0;
+        mat(1, 2) = Y * Z * (1 - cos0) + X * sin0;
         mat(2, 2) = cos0 + Z * Z * (1 - cos0);
 
         std::cout << "--------------------------\n" << mat << '\n';

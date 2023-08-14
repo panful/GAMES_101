@@ -233,11 +233,17 @@ void rst::rasterizer::set_pixel(const Eigen::Vector3f& point, const Eigen::Vecto
 {
     // old index: auto ind = point.y() + point.x() * width;
     // 如果像素坐标超出屏幕大小，直接返回不绘制该像素
-    if (point.x() < 0 || point.x() >= width || point.y() < 0 || point.y() >= height)
+    // if (point.x() < 0 || point.x() >= width || point.y() < 0 || point.y() >= height)
+    // {
+    //     return;
+    // }
+
+    auto ind = static_cast<int>((height - point.y()) * width + point.x());
+    if (ind >= width * height || ind < 0)
     {
+        std::cerr << "Index is error for pixels\n";
         return;
     }
 
-    auto ind       = static_cast<unsigned int>((height - point.y()) * width + point.x());
     frame_buf[ind] = color;
 }

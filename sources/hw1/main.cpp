@@ -2,9 +2,43 @@
 #include "rasterizer.hpp"
 #include <Eigen/Eigen>
 #include <iostream>
+#include <numbers>
 #include <opencv2/opencv.hpp>
 
 constexpr double MY_PI = 3.1415926535898;
+
+/// @brief 绕任意轴axis顺时针旋转angle度（注意此处是角度）
+/// @param axis
+/// @param angle
+/// @return
+Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
+{
+    Eigen::Matrix4f mat { Eigen::Matrix4f::Identity() };
+
+    angle = angle / 180.0f * std::numbers::pi_v<float>;
+
+    axis.normalize();
+    float X = axis.x();
+    float Y = axis.y();
+    float Z = axis.z();
+
+    auto cos0 = std::cos(angle);
+    auto sin0 = std::sin(angle);
+
+    mat(0, 0) = cos0 + X * X * (1 - cos0);
+    mat(1, 0) = X * Y * (1 - cos0) - Z * sin0;
+    mat(2, 0) = X * Z * (1 - cos0) + Y * sin0;
+
+    mat(0, 1) = Y * Z * (1 - cos0) + Z * sin0;
+    mat(1, 1) = cos0 + Y * Y * (1 - cos0);
+    mat(2, 1) = Y * Z * (1 - cos0) - Z * sin0;
+
+    mat(0, 2) = X * Z * (1 - cos0) - Y * sin0;
+    mat(1, 2) = Y * Z * (1 - cos0) + X * sin0;
+    mat(2, 2) = cos0 + Z * Z * (1 - cos0);
+
+    return mat;
+}
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
@@ -32,18 +66,32 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
 
-    // 绕Z轴旋转的矩阵
+
     Eigen::Matrix4f rotation;
     float sinAngle = sin(rotation_angle), cosAngle = cos(rotation_angle);
     // clang-format off
-    rotation << cosAngle, -sinAngle, 0, 0, 
-                sinAngle,  cosAngle, 0, 0, 
-                0,         0,        1, 0, 
-                0,         0,        0, 1;
+    // 绕X轴旋转的矩阵
+    // rotation << 1, 0,         0,        0, 
+    //             0, cosAngle, -sinAngle, 0, 
+    //             0, sinAngle,  cosAngle, 0, 
+    //             0, 0,         0,        1;
+
+    // 绕Y轴旋转的矩阵
+    // rotation << cosAngle, 0, sinAngle, 0, 
+    //             0,        1, 0,        0, 
+    //            -sinAngle, 0, cosAngle, 0, 
+    //             0,        0, 0,        1;
+
+    // 绕Z轴旋转的矩阵
+    // rotation << cosAngle, -sinAngle, 0, 0, 
+    //             sinAngle,  cosAngle, 0, 0, 
+    //             0,         0,        1, 0, 
+    //             0,         0,        0, 1;
     // clang-format on
 
+    // 绕 (1,1,1) 旋转
+    rotation = get_rotation(Eigen::Vector3f { 0.f, 0.f, 1.f }, rotation_angle);
     model *= rotation;
-
     return model;
 }
 

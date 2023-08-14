@@ -218,7 +218,7 @@ int main()
 
     // 在窗口中显示图片
     cv::imshow("OpenCV Window", image);
-    cv::waitKey();           // 等待按下任意键盘上的按钮
+    cv::waitKey();           // 等待按下任意键盘上的按钮，返回值是按下的按钮，参数是延时（单位ms）
     cv::destroyAllWindows(); // 销毁窗口
 }
 

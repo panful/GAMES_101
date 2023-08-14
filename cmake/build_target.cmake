@@ -3,7 +3,7 @@ function(BuildTarget path)
 
     foreach(subHW ${homeworks})
         get_filename_component(target_name ${subHW} NAME)
-        file(GLOB_RECURSE sources ${subHW}/*.cpp ${subHW}/*.h)
+        file(GLOB_RECURSE sources ${subHW}/*.cpp ${subHW}/*.h ${subHW}/*.hpp)
         set(target_name "${target_name}")
 
         # executable

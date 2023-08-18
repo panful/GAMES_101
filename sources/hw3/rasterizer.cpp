@@ -157,10 +157,10 @@ static Eigen::Vector2f interpolate(
 // Screen space rasterization
 void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eigen::Vector3f, 3>& view_pos)
 {
-    auto min_x = static_cast<int>(std::min({ t.a().x(), t.b().x(), t.c().x() }));
-    auto min_y = static_cast<int>(std::min({ t.a().y(), t.b().y(), t.c().y() }));
-    auto max_x = static_cast<int>(std::max({ t.a().x(), t.b().x(), t.c().x() }));
-    auto max_y = static_cast<int>(std::max({ t.a().y(), t.b().y(), t.c().y() }));
+    auto min_x = static_cast<int>(std::min({ t.a().x(), t.b().x(), t.c().x() })) - 1;
+    auto min_y = static_cast<int>(std::min({ t.a().y(), t.b().y(), t.c().y() })) - 1;
+    auto max_x = static_cast<int>(std::max({ t.a().x(), t.b().x(), t.c().x() })) + 1;
+    auto max_y = static_cast<int>(std::max({ t.a().y(), t.b().y(), t.c().y() })) + 1;
 
     for (int x = min_x; x < max_x; x++)
     {
@@ -169,17 +169,22 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
             if (insideTriangle(x, y, t.v))
             {
                 auto [alpha, beta, gamma] = computeBarycentric2D((float)x, (float)y, t.v);
-                auto uv                   = interpolate(alpha, beta, gamma, t.tex_coords[0], t.tex_coords[1], t.tex_coords[2], 1.f);
 
-                Eigen::Vector3f v0 = t.v[0].head<3>();
-                Eigen::Vector3f v1 = t.v[1].head<3>();
-                Eigen::Vector3f v2 = t.v[2].head<3>();
+                fragment_shader_payload frag;
+                frag.color      = interpolate(alpha, beta, gamma, t.color[0], t.color[1], t.color[2], 1.f);
+                frag.normal     = interpolate(alpha, beta, gamma, t.normal[0], t.normal[1], t.normal[2], 1.f);
+                frag.tex_coords = interpolate(alpha, beta, gamma, t.tex_coords[0], t.tex_coords[1], t.tex_coords[2], 1.f);
+                frag.view_pos   = interpolate(alpha, beta, gamma, view_pos[0], view_pos[1], view_pos[2], 1.f);
+                frag.texture    = &texture.value();
+                
+                Eigen::Vector3f fragColor = fragment_shader(frag);
 
-                auto pos = interpolate(alpha, beta, gamma, v0, v1, v2, 1.f);
+                Eigen::Vector3f v0  = t.v[0].head<3>();
+                Eigen::Vector3f v1  = t.v[1].head<3>();
+                Eigen::Vector3f v2  = t.v[2].head<3>();
+                Eigen::Vector3f pos = interpolate(alpha, beta, gamma, v0, v1, v2, 1.f);
 
-                Eigen::Vector3f color = texture.value().getColor(uv.x(), uv.y());
-
-                set_pixel(Eigen::Vector2i(x, y), color, pos.z());
+                set_pixel(Eigen::Vector2i(x, y), fragColor, pos.z());
             }
         }
     }
